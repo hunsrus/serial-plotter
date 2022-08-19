@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/gabriel/Documentos/Proyectos/serial-plotter/build",
+  "command": "/usr/bin/c++   -I/usr/local/include -o CMakeFiles/example.dir/main.cpp.o -c /home/gabriel/Documentos/Proyectos/serial-plotter/main.cpp",
+  "file": "/home/gabriel/Documentos/Proyectos/serial-plotter/main.cpp"
+},
+{
+  "directory": "/home/gabriel/Documentos/Proyectos/serial-plotter/build",
+  "command": "/usr/bin/c++   -I/usr/local/include -o CMakeFiles/example.dir/src/serialib.cpp.o -c /home/gabriel/Documentos/Proyectos/serial-plotter/src/serialib.cpp",
+  "file": "/home/gabriel/Documentos/Proyectos/serial-plotter/src/serialib.cpp"
+}
+]

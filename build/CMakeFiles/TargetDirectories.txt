@@ -1,0 +1,3 @@
+/home/gabriel/Documentos/Proyectos/serial-plotter/build/CMakeFiles/example.dir
+/home/gabriel/Documentos/Proyectos/serial-plotter/build/CMakeFiles/edit_cache.dir
+/home/gabriel/Documentos/Proyectos/serial-plotter/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/example.dir/main.cpp.o CMakeFiles/example.dir/src/serialib.cpp.o -o example  -Wl,-rpath,/usr/local/lib /usr/local/lib/libraylib.so -L/usr/local/lib -lraylib 

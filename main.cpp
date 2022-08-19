@@ -15,13 +15,15 @@
     #define SERIAL_PORT "/dev/ttyUSB0"
 #endif
 
+#define MCGREEN CLITERAL(Color){150,182,171,255}   // Verde Colin McRae
+
 int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
     float V_SCALE = 1.0f;
     float H_SCALE = 1.0f;
-    float LINE_THICKNESS = 1.0f;
+    float LINE_THICKNESS = 2.0f;
     
     const int screenWidth = 1366;
     const int screenHeight = 768;
@@ -36,6 +38,13 @@ int main(void)
     std::list<int> graphData;
 
     int EXCURSION_MAX = screenHeight/1.3;
+    int VISOR_MARGIN_V = (screenHeight-EXCURSION_MAX)/2;
+    int VISOR_MARGIN_H = (screenWidth-EXCURSION_MAX)/2;
+    Rectangle visorRectangle = {VISOR_MARGIN_H,VISOR_MARGIN_V,EXCURSION_MAX,EXCURSION_MAX};
+    Vector2 xOriginStart = {screenWidth/2,VISOR_MARGIN_V};
+    Vector2 xOriginEnd = {screenWidth/2,screenHeight-VISOR_MARGIN_V};
+    Vector2 yOriginStart = {VISOR_MARGIN_H,screenHeight/2};
+    Vector2 yOriginEnd = {screenWidth-VISOR_MARGIN_H,screenHeight/2};
 
     for(i = 0; i < EXCURSION_MAX; i++)  graphData.push_back(0);
 
@@ -82,7 +91,7 @@ int main(void)
 
         BeginDrawing();
 
-            ClearBackground((Color){150,182,171,255});
+            ClearBackground(MCGREEN);
             i = 0;
             for (std::list<int>::iterator it = graphData.begin(); it != std::prev(graphData.end()); it++)
             {
@@ -90,11 +99,15 @@ int main(void)
                 int posx2 = screenWidth/2+(EXCURSION_MAX/2-i-1)*H_SCALE;
                 int posy1 = screenHeight/2-(*it)*V_SCALE;
                 int posy2 = screenHeight/2-(*std::next(it))*V_SCALE;
-                if((posx2 <= screenWidth/2+EXCURSION_MAX/2) && (posx2 >= screenWidth/2-EXCURSION_MAX/2))
+                if((posx1 < screenWidth-VISOR_MARGIN_H) && (posx2 > VISOR_MARGIN_H))
                     DrawLineEx((Vector2){posx1,posy1},(Vector2){posx2,posy2},LINE_THICKNESS,WHITE);
                 i++;
             }
-            DrawRectangleLines(screenWidth/2-EXCURSION_MAX/2,screenHeight/2-EXCURSION_MAX/2,EXCURSION_MAX,EXCURSION_MAX,WHITE);
+            DrawRectangle(screenWidth/2-EXCURSION_MAX/2,0,EXCURSION_MAX,(screenHeight-EXCURSION_MAX)/2,MCGREEN);
+            DrawRectangle(screenWidth/2-EXCURSION_MAX/2,screenHeight-(screenHeight-EXCURSION_MAX)/2,EXCURSION_MAX,(screenHeight-EXCURSION_MAX)/2,MCGREEN);
+            DrawRectangleLinesEx(visorRectangle,3.0f,WHITE);
+            DrawLineEx(xOriginStart,xOriginEnd,0.4f,WHITE);
+            DrawLineEx(yOriginStart,yOriginEnd,0.4f,WHITE);
             
             DrawText(std::string("L: LINE THICKNESS").c_str(),20,90+20*0,20,WHITE);
             DrawText(std::string("V: VERTICAL SCALING").c_str(),20,90+20*1,20,WHITE);

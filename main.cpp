@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <string>
 #include <list>
+#include <iostream>
+#include <chrono>
+#include <math.h>
 
 #if defined (_WIN32) || defined(_WIN64)
     //for serial ports above "COM9", we must use this extended syntax of "\\.\COMx".
@@ -36,6 +39,7 @@ int main(void)
     char data[50];
     int i;
     std::list<int> graphData;
+    std::chrono::milliseconds timerMs;
 
     int EXCURSION_MAX = screenHeight/1.3;
     int VISOR_MARGIN_V = (screenHeight-EXCURSION_MAX)/2;
@@ -59,10 +63,20 @@ int main(void)
     //--------------------------------------------------------------------------------------
     while (!WindowShouldClose())
     {
-        serial.readString(data,'\n',10,200);
-        graphData.pop_back();
-        graphData.push_front(atoi(data));
-        serial.flushReceiver();
+        if(IsKeyDown(KEY_T))
+        {
+            timerMs = std::chrono::duration_cast< std::chrono::milliseconds >(
+            std::chrono::system_clock::now().time_since_epoch()
+            );
+            graphData.pop_back();
+            graphData.push_front((int)(sin((double)timerMs.count()/100)*100));
+        }else{
+            if(PORT_STATE!=1) serial.readString(data,'\n',10,200);
+            else data[0] = '\n';
+            graphData.pop_back();
+            graphData.push_front(atoi(data));
+            serial.flushReceiver();
+        }
 
         if(IsKeyPressed(KEY_R))
         {

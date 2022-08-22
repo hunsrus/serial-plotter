@@ -77,7 +77,7 @@ int main(void)
             graphData.pop_back();
             graphData.push_front((int)(sin((double)timerMs.count()/100)*512));
         }else{
-            if(PORT_STATE!=1) serial.readString(data,'\n',10,200);
+            if(PORT_STATE==1) serial.readString(data,'\n',10,200);
             else data[0] = '\n';
             graphData.pop_back();
             graphData.push_front(atoi(data));

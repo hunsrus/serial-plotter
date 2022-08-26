@@ -54,6 +54,7 @@ int main(void)
 
     float V_SCALE = 1.0f;
     float H_SCALE = 1.0f;
+    float OFFSET = 0.0f;
     float LINE_THICKNESS = 2.0f;
     int SUBDIVISIONS = 10;
 
@@ -117,6 +118,11 @@ int main(void)
             if(IsKeyDown(KEY_LEFT_SHIFT)) LINE_THICKNESS -= 0.2f;
             else LINE_THICKNESS += 0.2f;
         }
+        if(IsKeyPressed(KEY_O))
+        {
+            if(IsKeyDown(KEY_LEFT_SHIFT)) OFFSET -= (EXCURSION_MAX/SUBDIVISIONS)/2.0f;
+            else OFFSET += (EXCURSION_MAX/SUBDIVISIONS)/2.0f;
+        }
         //----------------------------------------------------------------------------------
         // Dibuja
         //----------------------------------------------------------------------------------
@@ -131,8 +137,8 @@ int main(void)
                 //int posx2 = screenWidth/2+(EXCURSION_MAX/2-i-1)*H_SCALE;
                 int posx1 = screenWidth/2+EXCURSION_MAX/2-i*H_SCALE;
                 int posx2 = screenWidth/2+EXCURSION_MAX/2-(i+1)*H_SCALE;
-                int posy1 = screenHeight/2-(*it)*V_SCALE;
-                int posy2 = screenHeight/2-(*std::next(it))*V_SCALE;
+                int posy1 = screenHeight/2-(*it)*V_SCALE+OFFSET;
+                int posy2 = screenHeight/2-(*std::next(it))*V_SCALE+OFFSET;
                 if((posx1 < screenWidth-VISOR_MARGIN_H) && (posx2 > VISOR_MARGIN_H))
                     DrawLineEx((Vector2){posx1,posy1},(Vector2){posx2,posy2},LINE_THICKNESS,WHITE);
                 i++;
@@ -158,7 +164,7 @@ int main(void)
             float valueFontSize = 10.0f;
             for(i = -(SUBDIVISIONS/2); i <= (SUBDIVISIONS/2); i++)
             {
-                float num = ((i*(EXCURSION_MAX/SUBDIVISIONS)/V_SCALE)*5/1024);
+                float num = ((i*(EXCURSION_MAX/SUBDIVISIONS)/V_SCALE)*5/1024)+OFFSET/V_SCALE*5/1024;
                 DrawText(std::string(std::to_string(num)).c_str(),screenWidth-VISOR_MARGIN_H+valueFontSize/2,screenHeight/2-i*(EXCURSION_MAX/SUBDIVISIONS)-valueFontSize/2,valueFontSize,WHITE);
             }
 

@@ -17,6 +17,7 @@
 #endif
 #if defined (__linux__) || defined(__APPLE__)
     #define SERIAL_PORT "/dev/ttyUSB0"
+    //#define SERIAL_PORT "/dev/ttyACM0"
 #endif
 
 #define MCGREEN CLITERAL(Color){150,182,171,255}   // Verde Colin McRae
@@ -126,8 +127,10 @@ int main(void)
             i = 0;
             for (std::list<int>::iterator it = graphData.begin(); it != std::prev(graphData.end()); it++)
             {
-                int posx1 = screenWidth/2+(EXCURSION_MAX/2-i)*H_SCALE;
-                int posx2 = screenWidth/2+(EXCURSION_MAX/2-i-1)*H_SCALE;
+                //int posx1 = screenWidth/2+(EXCURSION_MAX/2-i)*H_SCALE;
+                //int posx2 = screenWidth/2+(EXCURSION_MAX/2-i-1)*H_SCALE;
+                int posx1 = screenWidth/2+EXCURSION_MAX/2-i*H_SCALE;
+                int posx2 = screenWidth/2+EXCURSION_MAX/2-(i+1)*H_SCALE;
                 int posy1 = screenHeight/2-(*it)*V_SCALE;
                 int posy2 = screenHeight/2-(*std::next(it))*V_SCALE;
                 if((posx1 < screenWidth-VISOR_MARGIN_H) && (posx2 > VISOR_MARGIN_H))

@@ -38,6 +38,8 @@ int main(void)
     int i;
     std::list<int> graphData;
     std::chrono::milliseconds timerMs;
+    Font font1 = LoadFont("../src/fonts/JetBrainsMono/JetBrainsMono-Bold.ttf");
+    float fontSize = font1.baseSize;
 
     int EXCURSION_MAX = screenHeight/1.3f;
     int VISOR_MARGIN_V = (screenHeight-EXCURSION_MAX)/2;
@@ -57,6 +59,7 @@ int main(void)
     float OFFSET = 0.0f;
     float LINE_THICKNESS = 2.0f;
     int SUBDIVISIONS = 10;
+    float THRESHOLD = 0.0f;
 
     for(i = 0; i < EXCURSION_MAX; i++)  graphData.push_back(0);
 
@@ -71,7 +74,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
     while (!WindowShouldClose())
     {
-        if(IsKeyDown(KEY_T))
+        if(IsKeyDown(KEY_P))
         {
             timerMs = std::chrono::duration_cast< std::chrono::milliseconds >(
             std::chrono::system_clock::now().time_since_epoch()
@@ -120,8 +123,13 @@ int main(void)
         }
         if(IsKeyPressed(KEY_O))
         {
-            if(IsKeyDown(KEY_LEFT_SHIFT)) OFFSET -= (EXCURSION_MAX/SUBDIVISIONS)/2.0f;
-            else OFFSET += (EXCURSION_MAX/SUBDIVISIONS)/2.0f;
+            if(IsKeyDown(KEY_LEFT_SHIFT)) OFFSET += (EXCURSION_MAX/SUBDIVISIONS)/2.0f;
+            else OFFSET -= (EXCURSION_MAX/SUBDIVISIONS)/2.0f;
+        }
+        if(IsKeyPressed(KEY_T))
+        {
+            if(IsKeyDown(KEY_LEFT_SHIFT)) THRESHOLD += 0.2f;
+            else THRESHOLD -= 0.2f;
         }
         //----------------------------------------------------------------------------------
         // Dibuja
@@ -133,8 +141,6 @@ int main(void)
             i = 0;
             for (std::list<int>::iterator it = graphData.begin(); it != std::prev(graphData.end()); it++)
             {
-                //int posx1 = screenWidth/2+(EXCURSION_MAX/2-i)*H_SCALE;
-                //int posx2 = screenWidth/2+(EXCURSION_MAX/2-i-1)*H_SCALE;
                 int posx1 = screenWidth/2+EXCURSION_MAX/2-i*H_SCALE;
                 int posx2 = screenWidth/2+EXCURSION_MAX/2-(i+1)*H_SCALE;
                 int posy1 = screenHeight/2-(*it)*V_SCALE+OFFSET;
@@ -155,32 +161,38 @@ int main(void)
                 yLineEnd.y = yOriginEnd.y+EXCURSION_MAX/SUBDIVISIONS*i;
                 DrawLineEx(yLineStart,yLineEnd,0.25f,WHITE);
             }
-            
-            DrawText(std::string("L: LINE THICKNESS").c_str(),20,90+20*0,20,WHITE);
-            DrawText(std::string("V: VERTICAL SCALING").c_str(),20,90+20*1,20,WHITE);
-            DrawText(std::string("H: HORIZONTAL SCALING").c_str(),20,90+20*2,20,WHITE);
-            DrawText(std::string("S: SUBDIVISIONS AMOUNT").c_str(),20,90+20*3,20,WHITE);
 
-            float valueFontSize = 10.0f;
+            float valueFontSize = fontSize/2;
             for(i = -(SUBDIVISIONS/2); i <= (SUBDIVISIONS/2); i++)
             {
                 float num = ((i*(EXCURSION_MAX/SUBDIVISIONS)/V_SCALE)*5/1024)+OFFSET/V_SCALE*5/1024;
-                DrawText(std::string(std::to_string(num)).c_str(),screenWidth-VISOR_MARGIN_H+valueFontSize/2,screenHeight/2-i*(EXCURSION_MAX/SUBDIVISIONS)-valueFontSize/2,valueFontSize,WHITE);
+                DrawTextEx(font1,std::string(std::to_string(num)).c_str(),(Vector2){screenWidth-VISOR_MARGIN_H+valueFontSize/2,screenHeight/2-i*(EXCURSION_MAX/SUBDIVISIONS)-valueFontSize/2},valueFontSize,1,WHITE);
+                if(fabs(num) < 0.0001)
+                {
+                    yLineStart.y = yOriginStart.y-EXCURSION_MAX/SUBDIVISIONS*i;
+                    yLineEnd.y = yOriginEnd.y-EXCURSION_MAX/SUBDIVISIONS*i;
+                    DrawLineEx(yLineStart,yLineEnd,0.5f,RED);
+                }
             }
 
-            if(PORT_STATE!=1) DrawText(std::string("SERIAL PORT DISCONNECTED. PRESS \"R\" TO RECONNECT").c_str(),20,20,20,WHITE);
+            DrawTextEx(font1,std::string("L: LINE THICKNESS").c_str(),(Vector2){20,90+fontSize*0},fontSize,1,WHITE);
+            DrawTextEx(font1,std::string("V: VERTICAL SCALING").c_str(),(Vector2){20,90+fontSize*1},fontSize,1,WHITE);
+            DrawTextEx(font1,std::string("H: HORIZONTAL SCALING").c_str(),(Vector2){20,90+fontSize*2},fontSize,1,WHITE);
+            DrawTextEx(font1,std::string("S: SUBDIVISIONS AMOUNT").c_str(),(Vector2){20,90+fontSize*3},fontSize,1,WHITE);
+            DrawTextEx(font1,std::string("O: VERTICAL OFFSET").c_str(),(Vector2){20,90+fontSize*4},fontSize,1,WHITE);
+            DrawTextEx(font1,std::string("T: VERTICAL THRESHOLD").c_str(),(Vector2){20,90+fontSize*5},fontSize,1,WHITE);
+
+            if(PORT_STATE!=1) DrawTextEx(font1,std::string("SERIAL PORT DISCONNECTED. PRESS \"R\" TO RECONNECT").c_str(),(Vector2){20,20},fontSize,1,WHITE);
 
         EndDrawing();
 
         //----------------------------------------------------------------------------------
     }
-
+    
+    UnloadFont(font1);
+    serial.closeDevice();
 
     CloseWindow();
-    //--------------------------------------------------------------------------------------
-
-    // Close the serial device
-    serial.closeDevice();
 
     return 0;
 }

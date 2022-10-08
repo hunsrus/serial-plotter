@@ -21,6 +21,9 @@
 #endif
 
 #define MCGREEN CLITERAL(Color){150,182,171,255}   // Verde Colin McRae
+#define RESOLUTION 1024
+
+void DrawDottedLine(Vector2 startPos, Vector2 endPos, float thick, float divisions, Color color);
 
 int main(void)
 {
@@ -126,10 +129,27 @@ int main(void)
             if(IsKeyDown(KEY_LEFT_SHIFT)) OFFSET += (EXCURSION_MAX/SUBDIVISIONS)/2.0f;
             else OFFSET -= (EXCURSION_MAX/SUBDIVISIONS)/2.0f;
         }
-        if(IsKeyPressed(KEY_T))
+        if(IsKeyDown(KEY_T))
         {
-            if(IsKeyDown(KEY_LEFT_SHIFT)) THRESHOLD += 0.2f;
-            else THRESHOLD -= 0.2f;
+            if(IsKeyDown(KEY_LEFT_SHIFT))
+            {
+                //if(-THRESHOLD*V_SCALE < EXCURSION_MAX/2)
+                THRESHOLD -= 1.0f;
+            }
+            else
+            {
+                //if(THRESHOLD*V_SCALE < (EXCURSION_MAX/2))
+                THRESHOLD += 1.0f;
+            }
+        }
+        if(IsKeyPressed(KEY_R))
+        {
+            V_SCALE = 1.0f;
+            H_SCALE = 1.0f;
+            OFFSET = 0.0f;
+            LINE_THICKNESS = 2.0f;
+            SUBDIVISIONS = 10;
+            THRESHOLD = 0.0f;
         }
         //----------------------------------------------------------------------------------
         // Dibuja
@@ -162,18 +182,22 @@ int main(void)
                 DrawLineEx(yLineStart,yLineEnd,0.25f,WHITE);
             }
 
-            float valueFontSize = fontSize/2;
+            float valueFontSize = fontSize/1.5;
             for(i = -(SUBDIVISIONS/2); i <= (SUBDIVISIONS/2); i++)
             {
-                float num = ((i*(EXCURSION_MAX/SUBDIVISIONS)/V_SCALE)*5/1024)+OFFSET/V_SCALE*5/1024;
+                float num = ((i*(EXCURSION_MAX/SUBDIVISIONS)/V_SCALE)*5/RESOLUTION)+OFFSET/V_SCALE*5/RESOLUTION;
                 DrawTextEx(font1,std::string(std::to_string(num)).c_str(),(Vector2){screenWidth-VISOR_MARGIN_H+valueFontSize/2,screenHeight/2-i*(EXCURSION_MAX/SUBDIVISIONS)-valueFontSize/2},valueFontSize,1,WHITE);
-                if(fabs(num) < 0.0001)
                 {
-                    yLineStart.y = yOriginStart.y-EXCURSION_MAX/SUBDIVISIONS*i;
-                    yLineEnd.y = yOriginEnd.y-EXCURSION_MAX/SUBDIVISIONS*i;
-                    DrawLineEx(yLineStart,yLineEnd,0.5f,RED);
+                    yLineStart.y = yOriginStart.y+OFFSET;
+                    yLineEnd.y = yOriginEnd.y+OFFSET;
+                    DrawDottedLine(yLineStart, yLineEnd, 2.0f, 30, WHITE);
                 }
             }
+
+            yLineStart.y = yOriginStart.y-THRESHOLD*V_SCALE+OFFSET;
+            yLineEnd.y = yOriginEnd.y-THRESHOLD*V_SCALE+OFFSET;
+            DrawDottedLine(yLineStart, yLineEnd, 0.5f, 50, WHITE);
+            DrawTextEx(font1,std::string("T").c_str(),(Vector2){VISOR_MARGIN_H-valueFontSize,screenHeight/2-THRESHOLD*V_SCALE+OFFSET-valueFontSize/2},valueFontSize,1,WHITE);
 
             DrawTextEx(font1,std::string("L: LINE THICKNESS").c_str(),(Vector2){20,90+fontSize*0},fontSize,1,WHITE);
             DrawTextEx(font1,std::string("V: VERTICAL SCALING").c_str(),(Vector2){20,90+fontSize*1},fontSize,1,WHITE);
@@ -181,6 +205,7 @@ int main(void)
             DrawTextEx(font1,std::string("S: SUBDIVISIONS AMOUNT").c_str(),(Vector2){20,90+fontSize*3},fontSize,1,WHITE);
             DrawTextEx(font1,std::string("O: VERTICAL OFFSET").c_str(),(Vector2){20,90+fontSize*4},fontSize,1,WHITE);
             DrawTextEx(font1,std::string("T: VERTICAL THRESHOLD").c_str(),(Vector2){20,90+fontSize*5},fontSize,1,WHITE);
+            DrawTextEx(font1,std::string("R: RESET PARAMETERS").c_str(),(Vector2){20,90+fontSize*6},fontSize,1,WHITE);
 
             if(PORT_STATE!=1) DrawTextEx(font1,std::string("SERIAL PORT DISCONNECTED. PRESS \"R\" TO RECONNECT").c_str(),(Vector2){20,20},fontSize,1,WHITE);
 
@@ -195,4 +220,18 @@ int main(void)
     CloseWindow();
 
     return 0;
+}
+
+void DrawDottedLine(Vector2 startPos, Vector2 endPos, float thick, float divisions, Color color)
+{
+    int i;
+    float lenght = Vector2Distance(endPos,startPos);
+    float divLenght = lenght/divisions;
+    Vector2 divNorm = Vector2Normalize(Vector2Subtract(endPos,startPos));
+    for(i = 0; i < divisions; i++)
+    {
+        endPos = Vector2Add(startPos, Vector2Scale(divNorm,divLenght/2));
+        DrawLineEx(startPos,endPos,thick,color);
+        startPos = Vector2Add(startPos,Vector2Scale(divNorm,divLenght));
+    }
 }

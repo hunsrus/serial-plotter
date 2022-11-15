@@ -23,6 +23,12 @@
 #define MCGREEN CLITERAL(Color){150,182,171,255}   // Verde Colin McRae
 #define RESOLUTION 1024
 
+struct Theme
+{
+    Color background = MCGREEN;
+    Color foreground = WHITE;
+};
+
 void DrawDottedLine(Vector2 startPos, Vector2 endPos, float thick, float divisions, Color color);
 
 int main(void)
@@ -38,12 +44,27 @@ int main(void)
 
     serialib serial;
     char data[50];
-    int i;
+    int i, lastMax = 0, dataValue = 0;
     std::list<int> graphData;
     std::chrono::milliseconds timerMs;
     Font font1 = LoadFont("../src/fonts/JetBrainsMono/JetBrainsMono-Bold.ttf");
     float fontSize = font1.baseSize;
+    double tiempo = 0;
+    double tiempoAnterior = 0;
+    double tiempoAcumulado = 0;
+    int caida = 0;
+    int cantPicos = 0;
 
+    int THEMES_COUNT = 5;
+    struct Theme themes[THEMES_COUNT] = {{MCGREEN,WHITE},
+    {(Color){46,52,64,255},(Color){229,233,240,255}},
+    {(Color){3,57,75,255},(Color){187,231,250,255}},
+    {WHITE,BLACK},
+    {BLACK, WHITE}};
+
+    int CURRENT_THEME = 0;
+    Color COLOR_BACKGROUND = themes[0].background;
+    Color COLOR_FOREGROUND = themes[0].foreground;
     int EXCURSION_MAX = screenHeight/1.3f;
     int VISOR_MARGIN_V = (screenHeight-EXCURSION_MAX)/2;
     int VISOR_MARGIN_H = (screenWidth-EXCURSION_MAX)/2;
@@ -57,8 +78,8 @@ int main(void)
     Vector2 yLineStart = yOriginStart;
     Vector2 yLineEnd = yOriginEnd;
 
-    float V_SCALE = 1.0f;
-    float H_SCALE = 1.0f;
+    float V_SCALE = 0.4f;
+    float H_SCALE = 4.0f;
     float OFFSET = 0.0f;
     float LINE_THICKNESS = 2.0f;
     int SUBDIVISIONS = 10;
@@ -91,6 +112,7 @@ int main(void)
             dataValue = atoi(data);
             graphData.pop_back();
             graphData.push_front(dataValue);
+
             serial.flushReceiver();
         }
 
@@ -153,13 +175,26 @@ int main(void)
             SUBDIVISIONS = 10;
             THRESHOLD = 0.0f;
         }
+        if(IsKeyPressed(KEY_C))
+        {
+            if (CURRENT_THEME < THEMES_COUNT-1) CURRENT_THEME++;
+            else CURRENT_THEME = 0;
+            
+            COLOR_BACKGROUND = themes[CURRENT_THEME].background;
+            COLOR_FOREGROUND = themes[CURRENT_THEME].foreground;
+        }
         //----------------------------------------------------------------------------------
         // Dibuja
         //----------------------------------------------------------------------------------
 
         BeginDrawing();
 
-            ClearBackground(MCGREEN);
+            ClearBackground(COLOR_BACKGROUND);
+
+            caida = 0;
+            cantPicos = 0;
+            Color colorPico = COLOR_FOREGROUND;
+            lastMax = 0;
             i = 0;
             bool pico = false;
             /*auto tiempo = std::chrono::steady_clock::now();
@@ -210,43 +245,51 @@ int main(void)
                     DrawLineEx((Vector2){posx1,posy1},(Vector2){posx2,posy2},LINE_THICKNESS,colorPico);
                 i++;
             }
-            DrawRectangle(screenWidth/2-EXCURSION_MAX/2,0,EXCURSION_MAX,(screenHeight-EXCURSION_MAX)/2,MCGREEN);
-            DrawRectangle(screenWidth/2-EXCURSION_MAX/2,screenHeight-(screenHeight-EXCURSION_MAX)/2,EXCURSION_MAX,(screenHeight-EXCURSION_MAX)/2,MCGREEN);
-            DrawRectangleLinesEx(visorRectangle,3.0f,WHITE);
+
+            DrawRectangle(screenWidth/2-EXCURSION_MAX/2,0,EXCURSION_MAX,(screenHeight-EXCURSION_MAX)/2,COLOR_BACKGROUND);
+            DrawRectangle(screenWidth/2-EXCURSION_MAX/2,screenHeight-(screenHeight-EXCURSION_MAX)/2,EXCURSION_MAX,(screenHeight-EXCURSION_MAX)/2,COLOR_BACKGROUND);
+            DrawRectangleLinesEx(visorRectangle,3.0f,COLOR_FOREGROUND);
             for(i = -SUBDIVISIONS/2+1; i < SUBDIVISIONS/2; i++)
             {
                 xLineStart.x = xOriginStart.x+EXCURSION_MAX/SUBDIVISIONS*i;
                 xLineEnd.x = xOriginEnd.x+EXCURSION_MAX/SUBDIVISIONS*i;
-                DrawLineEx(xLineStart,xLineEnd,0.25f,WHITE);
+                DrawLineEx(xLineStart,xLineEnd,0.25f,COLOR_FOREGROUND);
                 yLineStart.y = yOriginStart.y+EXCURSION_MAX/SUBDIVISIONS*i;
                 yLineEnd.y = yOriginEnd.y+EXCURSION_MAX/SUBDIVISIONS*i;
-                DrawLineEx(yLineStart,yLineEnd,0.25f,WHITE);
+                DrawLineEx(yLineStart,yLineEnd,0.25f,COLOR_FOREGROUND);
             }
 
             float valueFontSize = fontSize/1.5;
             for(i = -(SUBDIVISIONS/2); i <= (SUBDIVISIONS/2); i++)
             {
                 float num = ((i*(EXCURSION_MAX/SUBDIVISIONS)/V_SCALE)*5/RESOLUTION)+OFFSET/V_SCALE*5/RESOLUTION;
-                DrawTextEx(font1,std::string(std::to_string(num)).c_str(),(Vector2){screenWidth-VISOR_MARGIN_H+valueFontSize/2,screenHeight/2-i*(EXCURSION_MAX/SUBDIVISIONS)-valueFontSize/2},valueFontSize,1,WHITE);
+                DrawTextEx(font1,std::string(std::to_string(num)).c_str(),(Vector2){screenWidth-VISOR_MARGIN_H+valueFontSize/2,screenHeight/2-i*(EXCURSION_MAX/SUBDIVISIONS)-valueFontSize/2},valueFontSize,1,COLOR_FOREGROUND);
                 {
                     yLineStart.y = yOriginStart.y+OFFSET;
                     yLineEnd.y = yOriginEnd.y+OFFSET;
-                    DrawDottedLine(yLineStart, yLineEnd, 2.0f, 30, WHITE);
+                    DrawDottedLine(yLineStart, yLineEnd, 2.0f, 30, COLOR_FOREGROUND);
                 }
             }
 
             yLineStart.y = yOriginStart.y-THRESHOLD*V_SCALE+OFFSET;
             yLineEnd.y = yOriginEnd.y-THRESHOLD*V_SCALE+OFFSET;
-            DrawDottedLine(yLineStart, yLineEnd, 0.5f, 50, WHITE);
-            DrawTextEx(font1,std::string("T").c_str(),(Vector2){VISOR_MARGIN_H-valueFontSize,screenHeight/2-THRESHOLD*V_SCALE+OFFSET-valueFontSize/2},valueFontSize,1,WHITE);
+            DrawDottedLine(yLineStart, yLineEnd, 0.5f, 50, COLOR_FOREGROUND);
+            DrawTextEx(font1,std::string("T").c_str(),(Vector2){VISOR_MARGIN_H-valueFontSize,screenHeight/2-THRESHOLD*V_SCALE+OFFSET-valueFontSize/2},valueFontSize,1,COLOR_FOREGROUND);
 
+            DrawTextEx(font1,std::string("L: LINE THICKNESS").c_str(),(Vector2){20,90+fontSize*0},fontSize,1,COLOR_FOREGROUND);
+            DrawTextEx(font1,std::string("V: VERTICAL SCALING").c_str(),(Vector2){20,90+fontSize*1},fontSize,1,COLOR_FOREGROUND);
+            DrawTextEx(font1,std::string("H: HORIZONTAL SCALING").c_str(),(Vector2){20,90+fontSize*2},fontSize,1,COLOR_FOREGROUND);
+            DrawTextEx(font1,std::string("S: SUBDIVISIONS AMOUNT").c_str(),(Vector2){20,90+fontSize*3},fontSize,1,COLOR_FOREGROUND);
+            DrawTextEx(font1,std::string("O: VERTICAL OFFSET").c_str(),(Vector2){20,90+fontSize*4},fontSize,1,COLOR_FOREGROUND);
+            DrawTextEx(font1,std::string("T: VERTICAL THRESHOLD").c_str(),(Vector2){20,90+fontSize*5},fontSize,1,COLOR_FOREGROUND);
+            DrawTextEx(font1,std::string("R: RESET PARAMETERS").c_str(),(Vector2){20,90+fontSize*6},fontSize,1,COLOR_FOREGROUND);
             DrawTextEx(font1,std::string("C: CHANGE THEME").c_str(),(Vector2){20,90+fontSize*7},fontSize,1,COLOR_FOREGROUND);
             //DrawTextEx(font1,std::to_string(cantPicos).c_str(),(Vector2){20,90+fontSize*7},fontSize,1,COLOR_FOREGROUND);
             int bpm = cantPicos*(60/(EXCURSION_MAX*0.02));
             //int bpm = tiempoAcumulado/cantPicos;
             //DrawTextEx(font1,std::string("PULSO: "+std::to_string((int)(bpm))+" [BPM]").c_str(),(Vector2){20,90+fontSize*20},fontSize,1,COLOR_FOREGROUND);
 
-            if(PORT_STATE!=1) DrawTextEx(font1,std::string("SERIAL PORT DISCONNECTED. PRESS \"R\" TO RECONNECT").c_str(),(Vector2){20,20},fontSize,1,WHITE);
+            if(PORT_STATE!=1) DrawTextEx(font1,std::string("SERIAL PORT DISCONNECTED. PRESS \"R\" TO RECONNECT").c_str(),(Vector2){20,20},fontSize,1,COLOR_FOREGROUND);
 
         EndDrawing();
 

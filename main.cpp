@@ -83,12 +83,14 @@ int main(void)
             std::chrono::system_clock::now().time_since_epoch()
             );
             graphData.pop_back();
-            graphData.push_front((int)(sin((double)timerMs.count()/100)*512));
+            int test_data = (int)(sin((double)timerMs.count()/100)*512);
+            graphData.push_front(test_data);
         }else{
             if(PORT_STATE==1) serial.readString(data,'\n',10,200);
             else data[0] = '\n';
+            dataValue = atoi(data);
             graphData.pop_back();
-            graphData.push_front(atoi(data));
+            graphData.push_front(dataValue);
             serial.flushReceiver();
         }
 
@@ -159,14 +161,53 @@ int main(void)
 
             ClearBackground(MCGREEN);
             i = 0;
+            bool pico = false;
+            /*auto tiempo = std::chrono::steady_clock::now();
+            auto tiempoAnterior = tiempo;*/
+            tiempo = 0;
+            tiempoAnterior = 0;
+            tiempoAcumulado = 0;
             for (std::list<int>::iterator it = graphData.begin(); it != std::prev(graphData.end()); it++)
             {
                 int posx1 = screenWidth/2+EXCURSION_MAX/2-i*H_SCALE;
                 int posx2 = screenWidth/2+EXCURSION_MAX/2-(i+1)*H_SCALE;
                 int posy1 = screenHeight/2-(*it)*V_SCALE+OFFSET;
                 int posy2 = screenHeight/2-(*std::next(it))*V_SCALE+OFFSET;
+
+                if(posy2 >= posy1)
+                {
+                    colorPico = COLOR_FOREGROUND;
+                    if(posy2 > lastMax)
+                    {
+                        caida = 0;
+                        lastMax = posy2;                        
+                    }
+                    pico = true;
+                }
+                else if((posy2 < lastMax) && pico)
+                {
+                    caida++;
+                    //colorPico = RED;      //Pinta los valores detectados de rojo
+                    if(caida > 5)
+                    {
+                        cantPicos++;
+                        caida = 0;
+                        colorPico = COLOR_FOREGROUND;
+                        pico = false;
+
+                        /*tiempo = std::chrono::steady_clock::now();
+                        std::chrono::duration<double> elapsed_seconds = tiempo-tiempoAnterior;
+                        tiempoAcumulado = (double)elapsed_seconds.count()*100;
+                        tiempoAnterior = tiempo;*/
+                        tiempo = i;
+                        tiempoAcumulado += (tiempo-tiempoAnterior)*0.01*60; //en segundos
+                        //tiempoAcumulado = tiempoAcumulado*0.01*60;
+                        tiempoAnterior = tiempo;
+                    }
+                }
+
                 if((posx1 < screenWidth-VISOR_MARGIN_H) && (posx2 > VISOR_MARGIN_H))
-                    DrawLineEx((Vector2){posx1,posy1},(Vector2){posx2,posy2},LINE_THICKNESS,WHITE);
+                    DrawLineEx((Vector2){posx1,posy1},(Vector2){posx2,posy2},LINE_THICKNESS,colorPico);
                 i++;
             }
             DrawRectangle(screenWidth/2-EXCURSION_MAX/2,0,EXCURSION_MAX,(screenHeight-EXCURSION_MAX)/2,MCGREEN);
@@ -199,13 +240,11 @@ int main(void)
             DrawDottedLine(yLineStart, yLineEnd, 0.5f, 50, WHITE);
             DrawTextEx(font1,std::string("T").c_str(),(Vector2){VISOR_MARGIN_H-valueFontSize,screenHeight/2-THRESHOLD*V_SCALE+OFFSET-valueFontSize/2},valueFontSize,1,WHITE);
 
-            DrawTextEx(font1,std::string("L: LINE THICKNESS").c_str(),(Vector2){20,90+fontSize*0},fontSize,1,WHITE);
-            DrawTextEx(font1,std::string("V: VERTICAL SCALING").c_str(),(Vector2){20,90+fontSize*1},fontSize,1,WHITE);
-            DrawTextEx(font1,std::string("H: HORIZONTAL SCALING").c_str(),(Vector2){20,90+fontSize*2},fontSize,1,WHITE);
-            DrawTextEx(font1,std::string("S: SUBDIVISIONS AMOUNT").c_str(),(Vector2){20,90+fontSize*3},fontSize,1,WHITE);
-            DrawTextEx(font1,std::string("O: VERTICAL OFFSET").c_str(),(Vector2){20,90+fontSize*4},fontSize,1,WHITE);
-            DrawTextEx(font1,std::string("T: VERTICAL THRESHOLD").c_str(),(Vector2){20,90+fontSize*5},fontSize,1,WHITE);
-            DrawTextEx(font1,std::string("R: RESET PARAMETERS").c_str(),(Vector2){20,90+fontSize*6},fontSize,1,WHITE);
+            DrawTextEx(font1,std::string("C: CHANGE THEME").c_str(),(Vector2){20,90+fontSize*7},fontSize,1,COLOR_FOREGROUND);
+            //DrawTextEx(font1,std::to_string(cantPicos).c_str(),(Vector2){20,90+fontSize*7},fontSize,1,COLOR_FOREGROUND);
+            int bpm = cantPicos*(60/(EXCURSION_MAX*0.02));
+            //int bpm = tiempoAcumulado/cantPicos;
+            //DrawTextEx(font1,std::string("PULSO: "+std::to_string((int)(bpm))+" [BPM]").c_str(),(Vector2){20,90+fontSize*20},fontSize,1,COLOR_FOREGROUND);
 
             if(PORT_STATE!=1) DrawTextEx(font1,std::string("SERIAL PORT DISCONNECTED. PRESS \"R\" TO RECONNECT").c_str(),(Vector2){20,20},fontSize,1,WHITE);
 

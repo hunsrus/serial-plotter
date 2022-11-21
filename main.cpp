@@ -284,6 +284,8 @@ int main(void)
             DrawTextEx(font1,std::string("T: VERTICAL THRESHOLD").c_str(),(Vector2){20,90+fontSize*5},fontSize,1,COLOR_FOREGROUND);
             DrawTextEx(font1,std::string("R: RESET PARAMETERS").c_str(),(Vector2){20,90+fontSize*6},fontSize,1,COLOR_FOREGROUND);
             DrawTextEx(font1,std::string("C: CHANGE THEME").c_str(),(Vector2){20,90+fontSize*7},fontSize,1,COLOR_FOREGROUND);
+            DrawTextEx(font1,std::string("SHIFT: REVERSE COMMAND").c_str(),(Vector2){20,90+fontSize*8},fontSize,1,COLOR_FOREGROUND);
+            DrawTextEx(font1,std::string("CTRL: FINE TUNING").c_str(),(Vector2){20,90+fontSize*9},fontSize,1,COLOR_FOREGROUND);
             //DrawTextEx(font1,std::to_string(cantPicos).c_str(),(Vector2){20,90+fontSize*7},fontSize,1,COLOR_FOREGROUND);
             int bpm = cantPicos*(60/(EXCURSION_MAX*0.02));
             //int bpm = tiempoAcumulado/cantPicos;

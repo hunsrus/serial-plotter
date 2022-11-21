@@ -55,12 +55,15 @@ int main(void)
     int caida = 0;
     int cantPicos = 0;
 
-    int THEMES_COUNT = 5;
+    int THEMES_COUNT = 8;
     struct Theme themes[THEMES_COUNT] = {{MCGREEN,WHITE},
     {(Color){46,52,64,255},(Color){229,233,240,255}},
     {(Color){3,57,75,255},(Color){187,231,250,255}},
-    {WHITE,BLACK},
-    {BLACK, WHITE}};
+    {(Color){78,70,67,255},(Color){254,167,0,255}},
+    {(Color){82,76,70,255},(Color){234,233,233,255}},
+    {(Color){43,43,43,255},(Color){155,155,155,255}},
+    {BLACK, WHITE},
+    {WHITE,BLACK}};
 
     int CURRENT_THEME = 0;
     Color COLOR_BACKGROUND = themes[0].background;

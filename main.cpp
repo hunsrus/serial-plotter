@@ -47,7 +47,7 @@ int main(void)
     int i, lastMax = 0, dataValue = 0;
     std::list<int> graphData;
     std::chrono::milliseconds timerMs;
-    Font font1 = LoadFont("../src/fonts/JetBrainsMono/JetBrainsMono-Bold.ttf");
+    Font font1 = LoadFont("src/fonts/JetBrainsMono/JetBrainsMono-Bold.ttf");
     float fontSize = font1.baseSize;
     double tiempo = 0;
     double tiempoAnterior = 0;

@@ -484,7 +484,7 @@ int main(void)
 
             valueDisplayPos.y += VAL_DISPLAY_ICON_H+SEPARATION_V;
             DrawRectangleRoundedLines((Rectangle){valueDisplayPos.x,valueDisplayPos.y,VAL_DISPLAY_ICON_W,VAL_DISPLAY_ICON_H},VAL_DISPLAY_ICON_W/1000.0f,10,3.0f,COLOR_FOREGROUND);
-            DrawTextEx(font1,"Media",(Vector2){valueDisplayPos.x+valueFontSize/4,valueDisplayPos.y},valueFontSize,1,COLOR_FOREGROUND);
+            DrawTextEx(font1,"Mean",(Vector2){valueDisplayPos.x+valueFontSize/4,valueDisplayPos.y},valueFontSize,1,COLOR_FOREGROUND);
             DrawTextEx(font1,dataMean.c_str(),(Vector2){valueDisplayPos.x+VAL_DISPLAY_ICON_W-fontSize*dataMax.length()*0.5f,valueDisplayPos.y+VAL_DISPLAY_ICON_H-fontSize},fontSize,1,COLOR_FOREGROUND);
 
             valueDisplayPos.y += VAL_DISPLAY_ICON_H+SEPARATION_V;
@@ -504,12 +504,12 @@ int main(void)
 
             valueDisplayPos.y += VAL_DISPLAY_ICON_H+SEPARATION_V;
             DrawRectangleRoundedLines((Rectangle){valueDisplayPos.x,valueDisplayPos.y,VAL_DISPLAY_ICON_W,VAL_DISPLAY_ICON_H},VAL_DISPLAY_ICON_W/1000.0f,10,3.0f,COLOR_FOREGROUND);
-            DrawTextEx(font1,"Frecuencia",(Vector2){valueDisplayPos.x+valueFontSize/4,valueDisplayPos.y},valueFontSize,1,COLOR_FOREGROUND);
+            DrawTextEx(font1,"Frequency",(Vector2){valueDisplayPos.x+valueFontSize/4,valueDisplayPos.y},valueFontSize,1,COLOR_FOREGROUND);
             DrawTextEx(font1,dataFrec.c_str(),(Vector2){valueDisplayPos.x+VAL_DISPLAY_ICON_W-fontSize*dataFrec.length()/2,valueDisplayPos.y+VAL_DISPLAY_ICON_H-fontSize},fontSize,1,COLOR_FOREGROUND);
 
             valueDisplayPos.y += VAL_DISPLAY_ICON_H+SEPARATION_V;
             DrawRectangleRoundedLines((Rectangle){valueDisplayPos.x,valueDisplayPos.y,VAL_DISPLAY_ICON_W,VAL_DISPLAY_ICON_H},VAL_DISPLAY_ICON_W/1000.0f,10,3.0f,COLOR_FOREGROUND);
-            DrawTextEx(font1,"Factor cresta",(Vector2){valueDisplayPos.x+valueFontSize/4,valueDisplayPos.y},valueFontSize,1,COLOR_FOREGROUND);
+            DrawTextEx(font1,"Crest factor",(Vector2){valueDisplayPos.x+valueFontSize/4,valueDisplayPos.y},valueFontSize,1,COLOR_FOREGROUND);
             DrawTextEx(font1,dataMean.c_str(),(Vector2){valueDisplayPos.x+VAL_DISPLAY_ICON_W-fontSize*dataRMS.length()/2,valueDisplayPos.y+VAL_DISPLAY_ICON_H-fontSize},fontSize,1,COLOR_FOREGROUND);
 
             if(PORT_STATE!=1){

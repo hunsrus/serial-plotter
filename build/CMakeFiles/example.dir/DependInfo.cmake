@@ -8,12 +8,12 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/gabriel/Documentos/Proyectos/serial-plotter/main.cpp" "CMakeFiles/example.dir/main.cpp.o" "gcc" "CMakeFiles/example.dir/main.cpp.o.d"
-  "/home/gabriel/Documentos/Proyectos/serial-plotter/src/serialib.cpp" "CMakeFiles/example.dir/src/serialib.cpp.o" "gcc" "CMakeFiles/example.dir/src/serialib.cpp.o.d"
+  "/home/gabriel/Documentos/Proyectos/serial-plotter-voltmeter/main.cpp" "CMakeFiles/example.dir/main.cpp.o" "gcc" "CMakeFiles/example.dir/main.cpp.o.d"
+  "/home/gabriel/Documentos/Proyectos/serial-plotter-voltmeter/src/serialib.cpp" "CMakeFiles/example.dir/src/serialib.cpp.o" "gcc" "CMakeFiles/example.dir/src/serialib.cpp.o.d"
   )
 
-# Targets to which this target links.
-set(CMAKE_TARGET_LINKED_INFO_FILES
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
   )
 
 # Fortran module output directory.

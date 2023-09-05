@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/example.dir/main.cpp.o CMakeFiles/example.dir/src/serialib.cpp.o -o example  -Wl,-rpath,/usr/local/lib /usr/local/lib/libraylib.so -L/usr/local/lib -lraylib 
+/usr/bin/c++ CMakeFiles/example.dir/main.cpp.o CMakeFiles/example.dir/src/serialib.cpp.o -o example  _deps/raylib-build/raylib/libraylib.a -lm -lpthread /usr/lib/libGL.so /usr/lib/libGLU.so _deps/raylib-build/raylib/external/glfw/src/libglfw3.a /usr/lib/librt.a -lm -ldl 

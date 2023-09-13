@@ -6,7 +6,7 @@ basic utility to analyze signals fed into an Arduino board.
 # Preview
 <img align="left" src="https://github.com/hunsrus/serial-plotter/blob/main/capture.png">
 
-# Line analizer
+# Line analyzer
 <img align="left" src="https://github.com/hunsrus/serial-plotter/blob/line-analyzer/capture-ln.png">
 
 # Digital filters
